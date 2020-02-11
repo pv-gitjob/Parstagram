@@ -15,20 +15,24 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var tableView: UITableView!
     
     var posts = [PFObject]()
+    var numberOfPosts = 20
+    
+    let myRefreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.delegate = self
         tableView.dataSource = self
+        
+        myRefreshControl.addTarget(self, action: #selector(loadPosts), for: .valueChanged)
+        tableView.refreshControl = myRefreshControl
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
+    @objc func loadPosts() {
         let query = PFQuery(className: "Posts")
         query.includeKey("author")
-        query.limit = 20
+        query.limit = numberOfPosts
         
         query.findObjectsInBackground { (posts, error) in
             if posts != nil {
@@ -36,6 +40,32 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.tableView.reloadData()
             }
         }
+        self.myRefreshControl.endRefreshing()
+    }
+    
+    func loadMorePosts() {
+        numberOfPosts = numberOfPosts + 20
+        let query = PFQuery(className: "Posts")
+        query.includeKey("author")
+        query.limit = numberOfPosts
+        
+        query.findObjectsInBackground { (posts, error) in
+            if posts != nil {
+                self.posts = posts!
+                self.tableView.reloadData()
+            }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row + 1 == numberOfPosts {
+            loadMorePosts()
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        loadPosts()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -47,13 +77,15 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         let post = posts[indexPath.row]
         let user = post["author"] as! PFUser
         
-        cell.usernameLabel.text = user.username
-        cell.captionLabel.text = post["caption"] as! String
+        cell.usernameLabel.text = ""//user.username
+        let postStr = post["caption"] as! String
+        cell.captionLabel.text = user.username! + " - " + postStr
         
         let imageFile = post["image"] as! PFFileObject
         let urlString = imageFile.url!
         let url = URL(string: urlString)!
-        //cell.photoView.af_setImage(withURL: url)
+        
+        cell.photoView.af_setImage(withURL: url)
         
         return cell
     }
