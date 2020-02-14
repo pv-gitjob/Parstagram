@@ -135,7 +135,6 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell") as! PostCell
             let user = post["author"] as! PFUser
             
-            //cell.usernameLabel.text = ""
             let postStr = post["caption"] as! String
             cell.captionLabel.text = user.username! + " - " + postStr
             
@@ -171,20 +170,6 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             selectedPost = post
         }
         
-        /*
-        comment["text"] = "First comment"
-        comment["post"] = post
-        comment["author"] = PFUser.current()!
-        
-        post.add(comment, forKey: "comments")
-        post.saveInBackground { (success, error) in
-            if success {
-                print("Comment saved")
-            } else {
-                print("Error saving comment")
-            }
-        }
-        */
     }
     /*
     // MARK: - Navigation
@@ -199,13 +184,6 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         PFUser.logOut()
         UserDefaults.standard.set(false, forKey: "userLoggedIn")
         self.dismiss(animated: true, completion: nil)
-        /*
-        let main = UIStoryboard(name: "Main", bundle: nil)
-        let loginViewController = main.instantiateViewController(withIdentifier: "LoginViewController")
-        
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.window?.rootViewController = loginViewController
-        */
     }
     
 }
