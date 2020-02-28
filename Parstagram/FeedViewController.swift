@@ -136,20 +136,38 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             let user = post["author"] as! PFUser
             
             let postStr = post["caption"] as! String
-            cell.captionLabel.text = user.username! + " - " + postStr
+            cell.captionLabel.text = user.username! + "   " + postStr
             
             let imageFile = post["image"] as! PFFileObject
             let urlString = imageFile.url!
             let url = URL(string: urlString)!
-            
             cell.photoView.af_setImage(withURL: url)
+            
+            if user["profilePicture"] != nil {
+                let imageFileP = user["profilePicture"] as! PFFileObject
+                let urlStringP = imageFileP.url!
+                let urlP = URL(string: urlStringP)!
+                cell.profileImageView.af_setImage(withURL: urlP)
+            }
+            
+            
             return cell
         } else if indexPath.row <= comments.count {
             let cell = tableView.dequeueReusableCell(withIdentifier: "CommentCell") as! CommentCell
             let comment = comments[indexPath.row - 1]
-            cell.commentLabel.text = comment["text"] as? String
             let user = comment["author"] as! PFUser
+            let temp: String = comment["text"] as! String
+            cell.commentLabel.text = user.username! + "   " + temp
+            
             cell.nameLabel.text = user.username
+            
+            if user["profilePicture"] != nil {
+                let imageFileP2 = user["profilePicture"] as! PFFileObject
+                let urlStringP2 = imageFileP2.url!
+                let urlP2 = URL(string: urlStringP2)!
+                cell.profileImageView.af_setImage(withURL: urlP2)
+            }
+            
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "AddCommentCell")!
